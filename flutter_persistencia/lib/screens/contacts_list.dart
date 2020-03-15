@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_persistencia/database/app_database.dart';
-import 'package:flutter_persistencia/models/Contact.dart';
-import 'package:flutter_persistencia/screens/contact_form.dart';
+import 'package:flutter_persistencia/database/dao/contact_dao.dart';
+import 'package:flutter_persistencia/models/contact.dart';
+
+import 'contact_form.dart';
 
 class ContactsList extends StatelessWidget {
+
+  final ContactDao _dao = ContactDao();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Contatos'),),
-      body: FutureBuilder(
-        future: findAll(),
+      appBar: AppBar(
+        title: Text('Contatos'),
+      ),
+      body: FutureBuilder<List<Contact>>(
+        initialData: List(),
+        future: _dao.findAll(),
         builder: (context, snapshot) {
-          switch(snapshot.connectionState) {
+          switch (snapshot.connectionState) {
             case ConnectionState.none:
               break;
             case ConnectionState.waiting:
@@ -22,7 +28,7 @@ class ContactsList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     CircularProgressIndicator(),
-                    Text('Loading'),
+                    Text('Carregando')
                   ],
                 ),
               );
@@ -40,16 +46,19 @@ class ContactsList extends StatelessWidget {
               );
               break;
           }
-          return Text('Unkown error');;
-        },),
+          return Text('Unknown error');
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ContactForm(),
-          ),).then((newContact) => debugPrint(newContact.toString()));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ContactForm(),
+            ),
+          );
         },
         child: Icon(
-            Icons.add
+          Icons.add,
         ),
       ),
     );
@@ -57,8 +66,8 @@ class ContactsList extends StatelessWidget {
 }
 
 class _ContactItem extends StatelessWidget {
-
   final Contact contact;
+
   _ContactItem(this.contact);
 
   @override
@@ -67,11 +76,15 @@ class _ContactItem extends StatelessWidget {
       child: ListTile(
         title: Text(
           contact.name,
-          style: TextStyle(fontSize: 24.0,),
+          style: TextStyle(
+            fontSize: 24.0,
+          ),
         ),
         subtitle: Text(
-          contact.acc.toString(),
-          style: TextStyle(fontSize: 16.0,),
+          contact.accountNumber.toString(),
+          style: TextStyle(
+            fontSize: 16.0,
+          ),
         ),
       ),
     );
