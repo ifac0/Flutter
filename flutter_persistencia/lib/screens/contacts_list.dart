@@ -10,8 +10,20 @@ class ContactsList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Contatos'),),
       body: FutureBuilder(
-        future: findAll(),
+        future: Future.delayed(Duration(seconds: 1)).then((value) => findAll()),
         builder: (context, snapshot) {
+          if( snapshot.data == null){
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  Text('Carregando'),
+                ],
+              ),
+            );
+          }
           final List<Contact> contacts = snapshot.data;
           return ListView.builder(
             itemBuilder: (context, index) {
